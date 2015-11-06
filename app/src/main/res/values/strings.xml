@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">条码记录器</string>
+    <string name="action_settings">设置</string>
+    <string name="save_to">保存至:</string>
+    <string name="match_ok">匹配成功:</string>
+    <string name="error_bar_code">无效的条形码</string>
+    <string name="click_to_scan_bar">点击此处扫描条形码</string>
+    <string name="bar_code_tip">条形码扫描结果</string>
+    <string name="data1_hint">数据1</string>
+    <string name="data2_hint">数据2</string>
+    <string name="data3_hint">数据3</string>
+    <string name="data4_hint">数据4</string>
+    <string name="now_time_hint">当前时间</string>
+    <string name="append">追加</string>
+    <string name="save">保存</string>
+    <string name="now_time">时间</string>
+    <string name="save_to_path_hint">保存至文件路径(点击可以修改)</string>
+</resources>

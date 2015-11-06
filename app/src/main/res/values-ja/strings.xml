@@ -1,0 +1,18 @@
+﻿<resources>
+    <string name="app_name">バーコード記録器</string>
+    <string name="action_settings">设置</string>
+    <string name="save_to">保存至:</string>
+    <string name="match_ok">匹配成功:</string>
+    <string name="error_bar_code">无效的条形码</string>
+    <string name="click_to_scan_bar">商品コード</string>
+    <string name="bar_code_tip">バーコードの結果</string>
+    <string name="data1_hint">エリアコード</string>
+    <string name="data2_hint">番地(縦)</string>
+    <string name="data3_hint">番地(横)</string>
+    <string name="data4_hint">箱数</string>
+    <string name="now_time_hint">今の時間</string>
+    <string name="append">追加</string>
+    <string name="save">保存</string>
+    <string name="now_time">確認</string>
+    <string name="save_to_path_hint">保存至文件路径(点击可以修改)</string>
+</resources>
