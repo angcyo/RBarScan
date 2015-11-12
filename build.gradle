@@ -16,7 +16,6 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven { url "https://raw.github.com/lychie/maven-repo/master/releases" }
     }
 }
 

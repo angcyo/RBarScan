@@ -93,4 +93,17 @@ public class ExcelUtil {
         return simpleDateFormat.format(new Date());
     }
 
+    public static boolean deleteFile(String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return false;
+        }
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return false;
+        }
+
+        return file.delete();
+    }
+
 }

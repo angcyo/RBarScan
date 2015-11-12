@@ -15,4 +15,9 @@
     <string name="save">保存</string>
     <string name="now_time">时间</string>
     <string name="save_to_path_hint">保存至文件路径(点击可以修改)</string>
+    <string name="cur_path_hint">当前路径(点击返回上一级)</string>
+    <string name="error_path_tip">无效的文件保存路径</string>
+    <string name="save_file_fail">保存文件失败</string>
+    <string name="clear_text">清空</string>
+    <string name="clear_all_tip">已清空</string>
 </resources>

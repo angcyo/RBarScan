@@ -108,27 +108,35 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/append"
-                app:layout_widthPercent="33%w" />
+                app:layout_widthPercent="25%w" />
 
             <Button
                 android:id="@+id/saveButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/save"
-                app:layout_widthPercent="33%w" />
+                app:layout_widthPercent="25%w" />
 
             <Button
                 android:id="@+id/timeButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/now_time"
-                app:layout_widthPercent="33%w" />
+                app:layout_widthPercent="25%w" />
+
+            <Button
+                android:id="@+id/clearButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/clear_text"
+                app:layout_widthPercent="25%w" />
         </com.zhy.android.percent.support.PercentLinearLayout>
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/filePathEditTextLayout"
             android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
 
             <EditText
                 android:id="@+id/filePathEditText"

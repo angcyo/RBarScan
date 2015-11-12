@@ -1,5 +1,6 @@
 package com.angcyo.rbarscan;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -7,14 +8,17 @@ import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -33,7 +37,7 @@ import butterknife.ButterKnife;
 import jxl.read.biff.BiffException;
 import jxl.write.WriteException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FolderChooseFragment.OnPathSet {
 
     private static String KEY_RUN_COUNT = "count";
     private static String KEY_FILE_PATH = "path";
@@ -57,14 +61,22 @@ public class MainActivity extends AppCompatActivity {
     Button saveButton;
     @Bind(R.id.timeButton)
     Button timeButton;
+    @Bind(R.id.clearButton)
+    Button clearButton;
     @Bind(R.id.fab)
     FloatingActionButton fab;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.filePathEditText)
     EditText filePathEditText;
+    @Bind(R.id.rootView)
+    View rootView;
+    @Bind(R.id.filePathEditTextLayout)
+    TextInputLayout filePathEditTextLayout;
+
     private List<List<String>> barCodeDatas;
     private String filePath;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
         init();
         initViews();
         initEvents();
+        initAfter();
+    }
+
+    private void initAfter() {
+        onPathSet(filePath);
     }
 
     private void init() {
@@ -95,9 +112,6 @@ public class MainActivity extends AppCompatActivity {
 
         long count = Hawk.get(KEY_RUN_COUNT, 0l);
         Hawk.put(KEY_RUN_COUNT, ++count);
-        if (count >= 24) {
-            throw new RuntimeException("启动时发生错误,请联系QQ:664738095");
-        }
 
         filePath = Hawk.get(KEY_FILE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
     }
@@ -111,25 +125,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initEvents() {
-        barEditView.setOnClickListener(new View.OnClickListener() {
+        barEditView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                DimensCodeTools.startScanBar(MainActivity.this);
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    DimensCodeTools.starScanWithBarSize(MainActivity.this, getResources().getDisplayMetrics().widthPixels - 100, 250);
+                }
+                return false;
             }
         });
 
-        filePathEditText.setOnClickListener(new View.OnClickListener() {
+        filePathEditText.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                chooseFilePath();
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    chooseFilePath();
+                }
+                return false;
             }
         });
 
         appendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<String> row = generateRowData();
-                barCodeDatas.add(row);
+                hideSoftInput();
+                appendData();
                 saveXls();
                 resetView();
             }
@@ -138,20 +158,43 @@ public class MainActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftInput();
+                appendData();
+                saveXls();
                 saveToXlsFile();//
+                resetView();
             }
         });
 
         timeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftInput();
                 dataEditView5.setText(ExcelUtil.getDateTime());
+            }
+        });
+
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                barCodeDatas.clear();
+                ExcelUtil.deleteFile();
+                ExcelUtil.deleteFile(getSaveFilePath());
+                Snackbar.make(fab, R.string.clear_all_tip, Snackbar.LENGTH_LONG).show();
             }
         });
     }
 
-    private void chooseFilePath() {
+    private void appendData() {
+        List<String> row = generateRowData();
+        barCodeDatas.add(row);
+    }
 
+    private void chooseFilePath() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.rootView, FolderChooseFragment.newInstance("/mnt", this), FolderChooseFragment.class.getSimpleName());
+        fragmentTransaction.addToBackStack(FolderChooseFragment.class.getSimpleName());
+        fragmentTransaction.commit();
     }
 
     private String getSaveFilePath() {
@@ -174,15 +217,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveToXlsFile() {
         try {
-            saveXls();
-            ExcelUtil.write(barCodeDatas, getSaveFilePath());
+            String filePath = getSaveFilePath();
+            ExcelUtil.deleteFile(filePath);
+            ExcelUtil.write(barCodeDatas, filePath);
             Snackbar.make(fab, getString(R.string.save_to) + getSaveFilePath(), Snackbar.LENGTH_LONG).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (BiffException e) {
-            e.printStackTrace();
-        } catch (WriteException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Snackbar.make(fab, R.string.save_file_fail, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -192,9 +232,10 @@ public class MainActivity extends AppCompatActivity {
         }
         barEditView.setInputType(InputType.TYPE_NULL);
         dataEditView5.setInputType(InputType.TYPE_NULL);
-//        filePathEditText.setInputType(InputType.TYPE_NULL);
+        filePathEditText.setInputType(InputType.TYPE_NULL);
 
         barEditViewLayout.setErrorEnabled(true);
+        filePathEditTextLayout.setErrorEnabled(true);
 
         filePathEditText.setText(filePath);
     }
@@ -209,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
             barEditView.setText(res);
             if (m.matches()) {
                 dataEditView5.setText(ExcelUtil.getDateTime());
+                barEditViewLayout.setError("");
                 Snackbar.make(fab, getString(R.string.match_ok) + res, Snackbar.LENGTH_LONG).show();
             } else {
                 barEditViewLayout.setError(getString(R.string.error_bar_code));
@@ -222,13 +264,21 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.unbind(this);
     }
 
+    private void hideSoftInput() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            ((InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
     private void resetView() {
         barEditView.setText(R.string.click_to_scan_bar);
-        dataEditView1.setText("0");
-        dataEditView2.setText("0");
-        dataEditView3.setText("0");
-        dataEditView4.setText("0");
-        dataEditView5.setText(ExcelUtil.getDateTime());
+        dataEditView1.setText("");
+        dataEditView2.setText("");
+        dataEditView3.setText("");
+        dataEditView4.setText("");
+        dataEditView5.setText("");
     }
 
     private List<String> generateRowData() {
@@ -242,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         timeString = dataEditView5.getText().toString();
 
         if (TextUtils.isEmpty(barCode) || barCode.equalsIgnoreCase(getResources().getString(R.string.click_to_scan_bar))) {
-            barCode = "";
+            barCode = "-";
         }
         if (TextUtils.isEmpty(data1)) {
             data1 = "0";
@@ -290,5 +340,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPathSet(String path) {
+        filePathEditText.setText(path);
+        File file = new File(path);
+        if (!file.canWrite()) {
+            filePathEditTextLayout.setError(getString(R.string.error_path_tip));
+        } else {
+            filePathEditTextLayout.setError("");
+        }
     }
 }
