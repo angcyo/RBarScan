@@ -108,6 +108,22 @@ public class CaptureActivity extends Activity implements Callback {
 	 */
 	private static final int MIN_BARODE_HEIGHT = 200;
 	/**
+	 * 震动时长
+	 */
+	private static final long VIBRATE_DURATION = 200L;
+	/**
+	 * 启动相册 Tag
+	 */
+	private static final int SELECT_PICTURE = 0;
+	/**
+	 * When the beep has finished playing, rewind to queue up another one.
+	 */
+	private final OnCompletionListener beepListener = new OnCompletionListener() {
+		public void onCompletion(MediaPlayer mediaPlayer) {
+			mediaPlayer.seekTo(0);
+		}
+	};
+	/**
 	 * 处理 捕获相机消息
 	 */
 	private CaptureActivityHandler handler;
@@ -209,7 +225,7 @@ public class CaptureActivity extends Activity implements Callback {
 	 * 检查参数
 	 */
 	private void checkParams() {
-		if (mQRCodeWidth < MIN_QRCODE_WIDTH 
+		if (mQRCodeWidth < MIN_QRCODE_WIDTH
 				|| mQRCodeWidth > getScreenPix()[0]) {
 			mQRCodeWidth = DEFAULT_QRCODE_WIDTH;
 		}
@@ -230,7 +246,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 获取屏幕的像素
-	 * 
+	 *
 	 * @return 宽和高的数组
 	 */
 	private int[] getScreenPix() {
@@ -267,7 +283,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 根据传入的features，选择 进行二维码or条码 进行扫描
-	 * 
+	 *
 	 * @param features
 	 *            值可能为 Constant.QRCODE_FEATURES(二维码) or
 	 *            Constant.BARCODE_FEATURES(条码)
@@ -463,17 +479,17 @@ public class CaptureActivity extends Activity implements Callback {
 		// 条形码文字
 		mGalleryText = createTextView("相册");
 		mGalleryLinear.addView(mGalleryText, textParams);
-		bottomLinear.addView(mGalleryLinear, galleryParams);
+//		bottomLinear.addView(mGalleryLinear, galleryParams);
 
 		// 添加底部
-		bottomLinear.setVisibility(View.GONE);//hky
+		bottomLinear.setVisibility(View.VISIBLE);//hky
 		mContent.addView(bottomLinear, bottomParams);
 
 	}
 
 	/**
 	 * 创建 TextView
-	 * 
+	 *
 	 * @param content
 	 *            内容
 	 * @return
@@ -488,7 +504,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 创建Linear
-	 * 
+	 *
 	 * @return
 	 */
 	private LinearLayout createLinear() {
@@ -551,7 +567,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 初始化 打开相机 启动线程解析
-	 * 
+	 *
 	 * @param surfaceHolder
 	 */
 	private void initCamera(SurfaceHolder surfaceHolder) {
@@ -592,7 +608,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 获取 相机管理
-	 * 
+	 *
 	 * @return CameraManger
 	 */
 	public CameraManager getCameraManager() {
@@ -601,7 +617,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 获取 扫描框
-	 * 
+	 *
 	 * @return
 	 */
 	public ViewfinderView getViewfinderView() {
@@ -610,7 +626,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 获取 消息处理
-	 * 
+	 *
 	 * @return
 	 */
 	public Handler getHandler() {
@@ -626,7 +642,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 处理解析
-	 * 
+	 *
 	 * @param obj
 	 * @param barcode
 	 */
@@ -638,7 +654,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 处理中文乱码问题
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -661,7 +677,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 回调 onActivityResult
-	 * 
+	 *
 	 * @param rawResult
 	 *            扫描结果
 	 * @param barcode
@@ -676,7 +692,7 @@ public class CaptureActivity extends Activity implements Callback {
 
 	/**
 	 * 重置相机预览
-	 * 
+	 *
 	 * @param delayMS
 	 *            延迟重置的时间，mm为单位
 	 */
@@ -712,16 +728,6 @@ public class CaptureActivity extends Activity implements Callback {
 	}
 
 	/**
-	 * 震动时长
-	 */
-	private static final long VIBRATE_DURATION = 200L;
-
-	/**
-	 * 启动相册 Tag
-	 */
-	private static final int SELECT_PICTURE = 0;
-
-	/**
 	 * 播放声音并震动
 	 */
 	private void playBeepSoundAndVibrate() {
@@ -735,15 +741,6 @@ public class CaptureActivity extends Activity implements Callback {
 			vibrator.vibrate(VIBRATE_DURATION);
 		}
 	}
-
-	/**
-	 * When the beep has finished playing, rewind to queue up another one.
-	 */
-	private final OnCompletionListener beepListener = new OnCompletionListener() {
-		public void onCompletion(MediaPlayer mediaPlayer) {
-			mediaPlayer.seekTo(0);
-		}
-	};
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'rbar_demo'
+            keyPassword 'angcyo'
+            storeFile file('F:/y2angcyo.jks')
+            storePassword 'angcyo'
+        }
+    }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "com.angcyo.rbarscan"
         minSdkVersion 14
@@ -13,7 +20,21 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            manifestPlaceholders = [app_label: "@string/app_name_rel"]
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            applicationIdSuffix "rel"
+            versionNameSuffix "rel"
+            signingConfig signingConfigs.config
+        }
+        preview {
+            manifestPlaceholders = [app_label: "@string/app_name_debug"]
+            applicationIdSuffix ".preview"
+            debuggable true // 保留debug信息
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.config
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -22,8 +43,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.android.support:design:23.1.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
     compile 'com.orhanobut:hawk:1.18'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.zhy:percent-support-extends:1.1.1'
