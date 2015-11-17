@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">条码记录器</string>
+    <string name="app_name_debug">条码记录器deg</string>
+    <string name="app_name_rel">条码记录器rel</string>
     <string name="action_settings">设置</string>
     <string name="save_to">保存至:</string>
     <string name="match_ok">匹配成功:</string>

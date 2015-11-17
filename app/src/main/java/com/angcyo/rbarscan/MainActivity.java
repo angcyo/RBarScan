@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -13,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -29,8 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -80,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements FolderChooseFragm
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("TAG", "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -96,6 +101,40 @@ public class MainActivity extends AppCompatActivity implements FolderChooseFragm
         initViews();
         initEvents();
         initAfter();
+
+        new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                new Handler() {
+
+                };
+            }
+        };
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.e("TAG", "onRestart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e("TAG", "onResume");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        Log.e("TAG", "onSaveInstanceState");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.e("TAG", "onRestoreInstanceState");
     }
 
     private void initAfter() {
@@ -245,23 +284,40 @@ public class MainActivity extends AppCompatActivity implements FolderChooseFragm
         super.onActivityResult(requestCode, resultCode, data);
         String res = DimensCodeTools.scanForResult(requestCode, resultCode, data);
         if (!TextUtils.isEmpty(res)) {
-            Pattern p = Pattern.compile("[0-9]*");
-            Matcher m = p.matcher(res);
+//            Pattern p = Pattern.compile("[0-9]*");
+//            Matcher m = p.matcher(res);
             barEditView.setText(res);
-            if (m.matches()) {
+//            if (m.matches()) {
                 dataEditView5.setText(ExcelUtil.getDateTime());
                 barEditViewLayout.setError("");
                 Snackbar.make(fab, getString(R.string.match_ok) + res, Snackbar.LENGTH_LONG).show();
-            } else {
-                barEditViewLayout.setError(getString(R.string.error_bar_code));
-            }
+//            } else {
+//                barEditViewLayout.setError(getString(R.string.error_bar_code));
+//            }
+        } else {
+            barEditView.setText("");
+            barEditViewLayout.setError(getString(R.string.error_bar_code));
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.e("TAG", "onDestroy");
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.e("TAG", "onKeyDown");
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.e("TAG", "onBackPressed");
+        moveTaskToBack(false);
     }
 
     private void hideSoftInput() {
